@@ -26,7 +26,27 @@ optional arguments:
 
 # Example
 
-Running ``` python3 generate_revision_sheet.py feedback.txt``` on the [feedback file](feedback.txt) returns the following table:
+Running ``` python3 generate_revision_sheet.py feedback.txt``` on the [feedback file](feedback.txt)
+```
+Thank you for submitting your paper to this journal. Please explain how you address the reviewers' comments.
+
+Reviewer 1:
+I really enjoyed reading the paper. The only comments I have are:
+The introduction needs to be more precise
+The background needs to be rewritten
+The methods are nice but you could also do something else
+
+Reviewer 2:
+I think this paper should never be published. It has major flaws in each section:
+
+Introduction\newline
+The topic is only relevant for practitioners. This is unacceptable.
+
+...
+
+```
+
+returns the following table:
 
 | Nr. | Comment                                                                                                      | How the comment is addressed |
 | :-- | :----------------------------------------------------------------------------------------------------------- | :--------------------------- |
