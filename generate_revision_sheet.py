@@ -6,6 +6,7 @@ import argparse
 import docx
 from docx.shared import Cm
 import pylatex
+from pytablewriter import MarkdownTableWriter
 
 def set_column_width(column, width):
     column.width = width
@@ -66,6 +67,38 @@ def generate_tex_revision_sheet(filepath, result_path,lines, starting_item):
 
     return
 
+
+def generate_md_revision_sheet(filepath, result_path,lines, starting_item):
+    
+    writer = MarkdownTableWriter()
+    if result_path:
+        result_path = result_path
+    else:
+        result_path = result_path + "revision_sheet.md"
+    writer.headers = ["Nr.", "Comment", "How the comment is addressed"]
+    
+    comment_list = []
+    for line in lines:
+        if not line.strip():
+            continue
+        comment_list.append(line.replace('\\newline', ''))
+
+    matrix = []
+    for i in range(len(comment_list)):
+        matrix.append([starting_item, comment_list[i], ""])        
+        starting_item += 1
+        print(matrix)
+
+    writer.value_matrix = matrix
+
+    writer.write_table()
+    
+    with open(result_path, "w") as f:
+        writer.stream = f
+        writer.write_table()
+    
+    return
+
 def load_file(filepath):
     comment_file = open(filepath, 'r') 
     lines = comment_file.readlines()
@@ -88,7 +121,7 @@ def load_file(filepath):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Revision-sheet generator")
     parser.add_argument("--input", default=None, help="path to the review text file") 
-    parser.add_argument("--format", default='w', help="format of the output document , w for word (default) or t for tex") 
+    parser.add_argument("--format", default='w', help="format of the output document , w for word (default) or t for tex or m for markdown") 
     parser.add_argument("--output", default=None, help="path to the file where to put the results (optional)") 
     parser.add_argument("--i", default=1, help="start of comment numbering (optional)") 
 
@@ -96,8 +129,12 @@ if __name__ == "__main__":
     filepath = args.input
     output_format = args.format
     result_path = args.output
+    if not result_path:
+        result_path = 'revision_sheet'
     starting_item = int(args.i)
     
+    assert output_format in ['t', 'w', 'm']
+
     if 'w' == output_format:
         if result_path:
             if '.doc' != result_path[:-4] or '.docx' != result_path[:-5]:
@@ -106,11 +143,15 @@ if __name__ == "__main__":
         if result_path:
             if '.tex' != result_path[:-4]:
                 result_path += '.tex'
+    if 'm' == output_format:
+        if result_path:
+            if '.md' != result_path[:-4]:
+                result_path += '.md'
     
     assert filepath[-4:] == '.txt'
-    assert output_format in ['t', 'w']
     assert isinstance(starting_item, int)
-    assert not os.path.exists(result_path)
+    if result_path:
+        assert not os.path.exists(result_path)
     
     lines = load_file(filepath)    
 
@@ -118,4 +159,6 @@ if __name__ == "__main__":
         generate_word_revision_sheet(filepath, result_path, lines, starting_item)
     if 't' == output_format:
         generate_tex_revision_sheet(filepath, result_path, lines, starting_item)
+    if 'm' == output_format:
+        generate_md_revision_sheet(filepath, result_path, lines, starting_item)
         
