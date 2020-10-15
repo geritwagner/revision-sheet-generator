@@ -56,7 +56,7 @@ def generate_tex_revision_sheet(filepath, result_path,lines, starting_item):
             for line in lines:
                 if not line.strip():
                     continue
-                table.add_row((starting_item, line.replace('\\newline', ''), ''))
+                table.add_row((starting_item, line.replace('\\newline', '').replace(' ',''), ''))
                 table.add_hline()
                 starting_item += 1
     
