@@ -26,7 +26,7 @@ optional arguments:
 
 # Example
 
-Running ``` python3 generate_revision_sheet.py feedback.txt``` on the [feedback file](feedback.txt)
+Running ``` python3 generate_revision_sheet.py --input feedback.txt --format w``` on the [feedback file](feedback.txt)
 ```
 Thank you for submitting your paper to this journal. Please explain how you address the reviewers' comments.
 
