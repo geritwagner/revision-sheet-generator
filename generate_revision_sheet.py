@@ -7,6 +7,7 @@ import docx
 from docx.shared import Cm
 import pylatex
 from pytablewriter import MarkdownTableWriter
+from pathlib import Path
 
 def set_column_width(column, width):
     column.width = width
@@ -105,19 +106,47 @@ def load_file(filepath):
     revised_lines = []
     temp = ''
     for line in lines:
-        if '\\newline' in line or ('Reviewer' in line and len(line.strip()) < 15):
-            temp += line
-            continue
-        if '' == temp:
-            revised_lines.append(line.rstrip())
-        else:
-            revised_lines.append(temp + line.rstrip())
+        # if '\\newline' in line or (any(x in line[:30] for x in ['Reviewer', 'Editor']) and len(line.strip()) < 40):
+        #     temp += line
+        #     continue
+        # if '' == temp:
+        #     revised_lines.append(line.rstrip())
+        # else:
+        #     revised_lines.append(temp + line.rstrip())
+        #     temp = ''
+        if 'NEXT_ISSUE' in line:
+            revised_lines.append(temp.replace('\n\n', '\n'))
             temp = ''
+        else:
+            temp += line
+        
     if '' != temp:
         revised_lines.append(temp.rstrip())
-    lines = revised_lines  
+    # lines = revised_lines
+
+    lines = []
+    temp = ''
+    for l in revised_lines:
+        if len(l) < 40:
+            temp += l
+            continue
+        else:
+            lines.append(str(temp+l).lstrip('\r\n').rstrip('\r\n'))
+            temp = ''
+
     return lines
 
+def set_markers(filename: Path) -> None:
+    import re
+    with open(filename) as f:
+        s = f.read()
+    if 'NEXT_ISSUE' not in s:
+        with open(filename, "w") as f:
+            s = re.sub(r'(^$\n)+', '\n\nNEXT_ISSUE\n\n', s, flags=re.MULTILINE)
+            # s = s.replace('\n\n', '\n\nNEXT_ISSUE\n\n')
+            f.write(s)
+    return
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Revision-sheet generator")
     parser.add_argument("--input", default=None, help="path to the review text file") 
@@ -153,7 +182,10 @@ if __name__ == "__main__":
     if result_path:
         assert not os.path.exists(result_path)
     
-    lines = load_file(filepath)    
+
+    set_markers(Path(filepath))
+
+    lines = load_file(filepath)
 
     if 'w' == output_format:
         generate_word_revision_sheet(filepath, result_path, lines, starting_item)

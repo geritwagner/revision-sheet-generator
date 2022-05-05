@@ -24,6 +24,10 @@ optional arguments:
 
 ```
 
+TODO: 
+- [ ] do not continue numbering (instead use prefixes, e.g., #ECIS_13 or #CAIS_R2_15; and possibly reviewer/ae prefixes, e.g., #CAIS_R2_R1_3 - for revision 2 and reviewer 1) - this makes it much easier to prepare the final revision sheets (simply search and replace)
+
+
 # Example
 
 Running ``` python3 generate_revision_sheet.py --input feedback.txt --format w``` on the [feedback file](feedback.txt)
